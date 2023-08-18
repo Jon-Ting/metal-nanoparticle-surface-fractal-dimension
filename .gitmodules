@@ -1,0 +1,3 @@
+[submodule "fastbc"]
+	path = fastbc
+	url = git@github.com:Jon-Ting/fastbc.git
