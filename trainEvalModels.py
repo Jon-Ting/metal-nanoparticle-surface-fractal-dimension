@@ -99,7 +99,7 @@ def evalModel(regModel, Xtrain, yTrain, Xtest, yTest, metric='coefficient of det
 def plotR2(yTrain, yTest, yPredTrain, yPredTest, modelName, 
            dataColour=PLOT_COLOURS[1], bestFitColour=PLOT_COLOURS[3], bestFitLW=1, perfectFitLW=1.5, 
            markerSize=20, markerAlpha=1.0, markerLW=0.7, 
-           figSize=(7, 3), figName='figures/DBoxR2.png'):
+           figSize=(7, 3), figName='figures/DBoxR2.png', showFig=False):
     fig, axes = plt.subplots(1, 2, figsize=figSize, dpi=DPI)
 
     perfectFitTrain = np.linspace(yTrain.min(), yTrain.max(), num=100)
@@ -121,14 +121,16 @@ def plotR2(yTrain, yTest, yPredTrain, yPredTest, modelName,
     fig.text(0.53, 0.0, r'Actual $D_{B}$', ha='center')
     fig.text(0.0, 0.4, r'Predicted $D_{B}$', ha='center', rotation=90)
     plt.tight_layout()
-    plt.savefig(figName, bbox_inches='tight')  # To be generalised
+    plt.savefig(figName, bbox_inches='tight')
+    if showFig:
+        plt.show()
 
 
 def plotR2All(yTrain, yTest, yPredTrain, yPredTest, modelName, 
               trainDataColour=PLOT_COLOURS[1], trainBestFitColour=PLOT_COLOURS[2], testDataColour=PLOT_COLOURS[3], testBestFitColour=PLOT_COLOURS[4], 
               bestFitLW=1.8, perfectFitLW=1.5, 
               markerSize=25, markerAlpha=1.0, markerLW=0.9, 
-              figSize=(4.5, 3.5), figName='figures/DBoxR2All.png'):
+              figSize=(4.5, 3.5), figName='figures/DBoxR2All.png', showFig=False):
     fig, ax = plt.subplots(figsize=figSize, dpi=DPI)
     
     mTrain, cTrain = np.polyfit(yTrain, yPredTrain, deg=1)
@@ -148,34 +150,44 @@ def plotR2All(yTrain, yTest, yPredTrain, yPredTest, modelName,
     plt.ylabel(r'Predicted $D_{B}$')
     plt.grid(linestyle='dotted')
     plt.legend(['Testing Data', 'Testing Best Fit', 'Training Data', 'Training Best Fit', 'Perfect Fit'])
-    plt.savefig(figName, bbox_inches='tight')  # To be generalised
+    plt.savefig(figName, bbox_inches='tight')
+    if showFig:
+        plt.show()
 
 
-def hyperparamTune(estimator, paramGrid, Xtrain, yTrain, Xtest, yTest, scoringMetric='r2', cv=KFold(n_splits=5, shuffle=True, random_state=RANDOM_SEED)):
+def hyperparamTune(estimator, paramGrid, Xtrain, yTrain, Xtest, yTest, scoringMetric='r2', cv=KFold(n_splits=5, shuffle=True, random_state=RANDOM_SEED), hideWarnings=True):
     gridSearch = GridSearchCV(estimator=estimator, param_grid=paramGrid, cv=cv, scoring=scoringMetric, 
                                n_jobs=1, error_score=np.nan, verbose=0)
     # randomSearch = RandomizedSearchCV(estimator=estimator, n_jobs=-1, cv=cvFold, param_distributions=paramGrid, scoring=scoringMetric)
-    searchResults = gridSearch.fit(Xtrain, yTrain)
+    if hideWarnings:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            searchResults = gridSearch.fit(Xtrain, yTrain)
+    else:
+        searchResults = gridSearch.fit(Xtrain, yTrain)
     bestModel = searchResults.best_estimator_
     print(f"Best score: {bestModel.score(Xtest, yTest):.3f}")
     print(f"Best parameter combination: {searchResults.best_params_}")
     return searchResults
 
 
-def plotLearningCurve(estimator, Xtrain, yTrain, modelName, figSize=(4.5, 3.5), metric='Coefficient of determination', figName='figures/DBoxLearnCurve.png'):
+def plotLearningCurve(estimator, Xtrain, yTrain, modelName, figSize=(4.5, 3.5), metric='Coefficient of determination', figName='figures/DBoxLearnCurve.png', showFig=False):
     fig, ax = plt.subplots(figsize=figSize, dpi=DPI)
-    learningCurveParams = {'X': Xtrain, 'y': yTrain, 'train_sizes': np.linspace(0.1, 1.0, 5), 'cv': ShuffleSplit(n_splits=50, test_size=0.2, random_state=0), 
-                           'score_type': 'both', 'n_jobs': 4, 'std_display_style': 'fill_between', 'score_name': metric, 
+    learningCurveParams = {'X': Xtrain, 'y': yTrain, 'train_sizes': np.linspace(0.1, 1.0, 5), 
+                           'cv': ShuffleSplit(n_splits=50, test_size=TEST_SET_FRACTION, random_state=RANDOM_SEED), 
+                           'score_type': 'both', 'n_jobs': NUM_JOBS, 'std_display_style': 'fill_between', 'score_name': metric, 
                            'line_kw': {'marker': 'o'}}
     LearningCurveDisplay.from_estimator(estimator, **learningCurveParams, ax=ax)
     handles, label = ax.get_legend_handles_labels()
     plt.xlabel('Number of training samples')
     plt.legend(handles[:2], ["Training Score", "Test Score"])
     plt.grid(linestyle='dotted')
-    plt.savefig(figName, bbox_inches='tight')  # To be generalised
+    plt.savefig(figName, bbox_inches='tight')
+    if showFig:
+        plt.show()
 
 
-def plotTopImpFeats(model, Xtrain, modelName, isForest=False, numFeat=40, figSize=(13, 3), figName='figures/DBoxFeatImp.png'):
+def plotTopImpFeats(model, Xtrain, modelName, isForest=False, numFeat=40, figSize=(13, 3), figName='figures/DBoxFeatImp.png', showFig=False):
     featureNames = model.feature_names_in_ if modelName != 'LGBMR' else model.feature_name_
     if isForest:
         impStds = np.std([tree.feature_importances_ for tree in model.estimators_])
@@ -195,21 +207,23 @@ def plotTopImpFeats(model, Xtrain, modelName, isForest=False, numFeat=40, figSiz
     plt.xticks(rotation=45, ha='right')
     plt.ylabel('Feature importance')
     plt.grid(linestyle='dotted')
-    plt.savefig(figName, bbox_inches='tight')  # To be generalised
+    plt.savefig(figName, bbox_inches='tight')
+    if showFig:
+        plt.show()
 
 
-def runModel(Xtrain, yTrain, Xtest, yTest, model, modelName, datasetName, figNameAppendix, showFeatCoef=True, plotFeatImp=False, verbose=False):
+def runModel(Xtrain, yTrain, Xtest, yTest, model, modelName, datasetName, figNameAppendix, showFeatCoef=True, plotFeatImp=False, verbose=False, showFig=False):
     if verbose: 
         print(f"  Running {modelName}")
     yPredTrain, yPredTest, model = evalModel(model, Xtrain, yTrain, Xtest, yTest)
-    plotR2(yTrain, yTest, yPredTrain, yPredTest, modelName, figName=f"figures/{datasetName}DBoxR2{modelName}_{figNameAppendix}.png")
-    plotR2All(yTrain, yTest, yPredTrain, yPredTest, modelName, figName=f"figures/{datasetName}DBoxR2All{modelName}_{figNameAppendix}.png")
-    plotLearningCurve(model, Xtrain, yTrain, modelName, figName=f"figures/{datasetName}DBoxLearnCurve{modelName}_{figNameAppendix}.png")
+    plotR2(yTrain, yTest, yPredTrain, yPredTest, modelName, figName=f"figures/{datasetName}DBoxR2{modelName}_{figNameAppendix}.png", showFig=showFig)
+    plotR2All(yTrain, yTest, yPredTrain, yPredTest, modelName, figName=f"figures/{datasetName}DBoxR2All{modelName}_{figNameAppendix}.png", showFig=showFig)
+    plotLearningCurve(model, Xtrain, yTrain, modelName, figName=f"figures/{datasetName}DBoxLearnCurve{modelName}_{figNameAppendix}.png", showFig=showFig)
     if showFeatCoef:
         print("  Feature coefficients:")
         for (i, coefficient) in enumerate(model.coef_):
             if round(coefficient, 3) >= 0.001:
                 print(f"    {model.feature_names_in_[i]}: {coefficient:.3f}")
     if plotFeatImp:
-        plotTopImpFeats(model, Xtrain, modelName, figName=f"figures/{datasetName}DBoxFeatImp{modelName}_{figNameAppendix}.png")
+        plotTopImpFeats(model, Xtrain, modelName, figName=f"figures/{datasetName}DBoxFeatImp{modelName}_{figNameAppendix}.png", showFig=showFig)
     return yPredTrain, yPredTest, model
