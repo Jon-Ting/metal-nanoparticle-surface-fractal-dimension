@@ -1,4 +1,7 @@
-pickleFiles/
 testCases/
-outputsParamTune/
 .ipynb_checkpoints
+.idea
+__pycache__
+data/
+archive/
+tmpWorkDir/
