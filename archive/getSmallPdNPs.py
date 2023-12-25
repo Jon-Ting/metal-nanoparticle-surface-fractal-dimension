@@ -2,12 +2,14 @@ from os import listdir
 from shutil import copy
 
 
+
+SIZE_THRESH = 4000
 smallNPnames = []
 for fName in listdir('.'):
     if 'xyz' in fName:
         with open(fName, 'r') as f1:
             numAtom = int(f1.readline())
-            if numAtom <= 1000:
+            if numAtom <= SIZE_THRESH:
                 print(fName)
                 smallNPnames.append(fName.split('.')[0])
                 copy(fName, './smallPdNPs/')
