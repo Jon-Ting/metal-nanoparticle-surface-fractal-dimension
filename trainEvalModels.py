@@ -180,6 +180,8 @@ def plotTopImpFeats(model, Xtrain, modelName, isForest=False, numFeat=40, figSiz
     if isForest:
         impStds = np.std([tree.feature_importances_ for tree in model.estimators_])
         featImps = pd.DataFrame({'feature': featureNames, 'importance': model.feature_importances_, 'std': impStds})
+    elif 'ETR' in modelName:
+        featImps = pd.DataFrame({'feature': featureNames, 'importance': model.estimator.feature_importances_})
     else:
         featImps = pd.DataFrame({'feature': featureNames, 'importance': model.feature_importances_})
     featImps.sort_values(by='importance', ascending=False, inplace=True)
