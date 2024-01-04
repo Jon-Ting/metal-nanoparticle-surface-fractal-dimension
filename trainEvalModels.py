@@ -21,6 +21,17 @@ mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=['#303F9F', '#FF5252', '#D32F
 
 def rmLowVarFeats(featsDF, varThresh=0.0, verbose=False):
     if verbose:
+        print(f"Removing the features with null values...")
+        print(f"  Original number of features: {len(featsDF.columns)}")
+    featsToDrop = []
+    for feat in featsDF.columns:
+        if featsDF[feat].isnull().any():
+            featsToDrop.append(feat)
+    featsDF.drop(featsToDrop, axis=1, inplace=True)
+    if verbose:
+        print(f"  Total number of features left: {len(featsDF.columns)}\n")
+    
+    if verbose:
         print(f"Removing the features with variance below {varThresh:.2f}...")
         print(f"  Original number of features: {len(featsDF.columns)}")
     featsToDrop = []
