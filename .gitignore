@@ -1,7 +1,14 @@
-testCases/
 .ipynb_checkpoints
 .idea
 __pycache__
 data/
-archive/
+testCases/
 tmpWorkDir/
+metal-nanoparticle-box-counting-dimension-analysis.ipynb
+metal-nanoparticle-box-counting-dimension-comparisons-across-representations-shapes-sizes-elements-monometallic.ipynb
+metal-nanoparticle-box-counting-dimension-melting-trajectory-analysis-bimetallic.ipynb
+figures/BCDcorr/
+figures/metrics/
+figures/predModel/
+figures/figures.pptx
+TODO
