@@ -2,7 +2,7 @@
 .idea
 __pycache__
 archive/
-data/*csv
+data/*.csv
 data/hiddenData/
 testCases/
 
