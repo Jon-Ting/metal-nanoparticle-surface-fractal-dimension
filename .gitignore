@@ -3,7 +3,7 @@
 __pycache__
 archive/
 data/*csv
-data/hiddenData
+data/hiddenData/
 testCases/
 
 metal-nanoparticle-box-counting-dimension-analysis-original.ipynb
