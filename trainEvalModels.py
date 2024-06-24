@@ -32,16 +32,16 @@ def rmNullLowVarFeats(featsDF, rmNull=False, varThresh=0.0, verbose=False):
         featsDF.drop(featsToDrop, axis=1, inplace=True)
         if verbose:
             print(f"  Total number of features left: {len(featsDF.columns)}\n")
-    if verbose:
-        print(f"Removing the features with null values...")
-        print(f"  Original number of features: {len(featsDF.columns)}")
-    featsToDrop = []
-    for feat in featsDF.columns:
-        if featsDF[feat].isnull().any():
-            featsToDrop.append(feat)
-    featsDF.drop(featsToDrop, axis=1, inplace=True)
-    if verbose:
-        print(f"  Total number of features left: {len(featsDF.columns)}\n")
+    # if verbose:
+    #     print(f"Removing the features with null values...")
+    #     print(f"  Original number of features: {len(featsDF.columns)}")
+    # featsToDrop = []
+    # for feat in featsDF.columns:
+    #     if featsDF[feat].isnull().any():
+    #         featsToDrop.append(feat)
+    # featsDF.drop(featsToDrop, axis=1, inplace=True)
+    # if verbose:
+    #     print(f"  Total number of features left: {len(featsDF.columns)}\n")
     
     if verbose:
         print(f"Removing the features with variance below {varThresh:.2f}...")
