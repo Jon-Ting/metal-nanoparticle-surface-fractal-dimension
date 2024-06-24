@@ -9,7 +9,7 @@ testCases/
 metal-nanoparticle-box-counting-dimension-analysis-original.ipynb
 figures/predModel/
 figures/metrics/
-TODO
+figures/EDA/
 
 metal-nanoparticle-box-counting-dimension-comparisons-across-representations-shapes-sizes-elements-monometallic.ipynb
 metal-nanoparticle-box-counting-dimension-melting-trajectory-analysis-bimetallic.ipynb
